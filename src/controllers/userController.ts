@@ -31,6 +31,27 @@ export const createUser = catchAsyncError(
     res: IUserPublicInfoResponse,
     next: NextFunction
   ) => {
+    /* 
+    #swagger.summary = 'Create new user with invite token'
+    #swagger.tags = ['Users'] 
+    #swagger.summary = 'Get All Tasks of current user'
+    #swagger.parameters = [{ 
+            "name": "authorization",
+            "in": "header",
+            "type": "string",
+            "required": true,
+            "schema": {"type":"string", "format":"jwt", "example":"Bearer your_token_here"},
+    }]
+      #swagger.responses[200] = {
+            description: 'Public info for created User',
+            schema: { $ref: '#/definitions/PublicUserInfo' }
+      }
+      #swagger.responses[500] = {
+        description: 'Something went wrong',
+        schema: {status: "string", message: "string"}
+      }
+    
+    */
     const userQuery = new User({
       ...req.body,
       email: req.email,
@@ -43,6 +64,25 @@ export const createUser = catchAsyncError(
 
 export const userLogin = catchAsyncError(
   async (req: Request, res: ITokenResponse, next: NextFunction) => {
+    /* #swagger.tags = ['Users'] 
+    #swagger.summary = 'Log in user'
+    #swagger.parameters = [{ 
+            "name": "authorization",
+            "in": "header",
+            "type": "string",
+            "required": true,
+            "schema": {"type":"string", "format":"jwt", "example":"Bearer your_token_here"},
+    }]
+      #swagger.responses[200] = {
+            description: 'Auth token for logged in user',
+            schema: { "token": "string" }
+      }
+      #swagger.responses[500] = {
+         description: 'Something went wrong',
+        schema: {status: "string", message: "string"}
+      }
+       
+    */
     const { email, password } = req.body;
     const user = await User.getUserByCredentials(email, password);
     const token = generateAuthJWT(user.id);
@@ -57,6 +97,25 @@ export const userLogout = catchAsyncError(
     res: Response<{ message: string }>,
     next: NextFunction
   ) => {
+    /* #swagger.tags = ['Users'] 
+    #swagger.summary = 'Log out current user'
+    #swagger.parameters = [{ 
+            "name": "authorization",
+            "in": "header",
+            "type": "string",
+            "required": true,
+            "schema": {"type":"string", "format":"jwt", "example":"Bearer your_token_here"},
+    }]
+      #swagger.responses[200] = {
+            description: 'Message on login success',
+            schema: { "message": "string" }
+      }
+      #swagger.responses[500] = {
+       description: 'Something went wrong',
+        schema: {status: "string", message: "string"}
+      }
+    
+    */
     req.user.tokens = [];
     await req.user.save();
 
@@ -70,6 +129,26 @@ export const updateMe = catchAsyncError(
     res: IUserPublicInfoResponse,
     next: NextFunction
   ) => {
+    /* 
+    #swagger.tags = ['Users']
+    #swagger.summary = 'Update current user's info (for passwords, use reset password endpoint)' 
+    #swagger.parameters = [{ 
+            "name": "authorization",
+            "in": "header",
+            "type": "string",
+            "required": true,
+            "schema": {"type":"string", "format":"jwt", "example":"Bearer your_token_here"},
+    }]
+      #swagger.responses[200] = {
+            description: 'Updated current user public info',
+            schema: { $ref: '#/definitions/PublicUserInfo' }
+      }
+      #swagger.responses[500] = {
+         description: 'Something went wrong',
+        schema: {status: "string", message: "string"}
+      }
+      
+    */
     const updates = Object.keys(req.body || {});
 
     // ideally email should also be reset by sending out a magic link to the existing email
@@ -96,6 +175,26 @@ export const updateMe = catchAsyncError(
 
 export const createUserInvite = catchAsyncError(
   async (req: Request, res: ITokenResponse, next: NextFunction) => {
+    /* 
+    #swagger.tags = ['Users'] 
+    #swagger.summary = 'Generate invite token (accessible only for admin users)'
+    #swagger.parameters = [{ 
+            "name": "authorization",
+            "in": "header",
+            "type": "string",
+            "required": true,
+            "schema": {"type":"string", "format":"jwt", "example":"Bearer your_token_here"},
+    }]
+      #swagger.responses[200] = {
+            description: 'token generated for User invite',
+            schema: { "token":"string" }
+      }
+      #swagger.responses[500] = {
+         description: 'Something went wrong',
+        schema: {status: "string", message: "string"}
+      }
+    
+    */
     const { email } = req.body;
 
     if (!isValidEmail(email)) throw new AppError("Invalid Email address", 500);
@@ -119,7 +218,26 @@ export const getMe = catchAsyncError(
     res: IUserPublicInfoResponse,
     next: NextFunction
   ) => {
-    console.log(req.user.id);
+    /* 
+    #swagger.tags = ['Users'] 
+    #swagger.summary = 'Get public info of current user'
+    #swagger.parameters = [{ 
+            "name": "authorization",
+            "in": "header",
+            "type": "string",
+            "required": true,
+            "schema": {"type":"string", "format":"jwt", "example":"Bearer your_token_here"},
+    }]
+      #swagger.responses[200] = {
+            description: 'Get current user public info',
+            schema: { $ref: '#/definitions/PublicUserInfo' }
+      }
+      #swagger.responses[500] = {
+        description: 'Something went wrong',
+        schema: {status: "string", message: "string"}
+      }
+      
+    */
     const user = await User.findById(req?.user?.id).select("name email");
 
     return res.status(200).json(user);

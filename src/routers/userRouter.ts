@@ -23,7 +23,7 @@ router
   .post("/login", userLogin)
   .post("/logout", isAuthenticated, userLogout)
   .post("/:token", isInvited, createUser)
-  .patch("/", isAuthenticated, updateMe)
+  .patch("/me", isAuthenticated, updateMe)
   .get("/me", isAuthenticated, getMe);
 
 module.exports = router;
