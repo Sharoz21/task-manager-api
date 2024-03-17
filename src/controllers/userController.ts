@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import User from "../models/user";
+import User, { IToken } from "../models/user";
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 import "dotenv/config";
@@ -7,7 +7,12 @@ import { isValidEmail } from "../utils/emailValidation";
 import Invitation from "../models/invitation";
 import { catchAsyncError } from "../utils/catchAsyncError";
 import AppError from "../utils/appError";
-import { IGetUserAuthInfoRequest, IGetUserEmailRequest } from "../types";
+import {
+  IGetUserAuthInfoRequest,
+  IGetUserEmailRequest,
+  ITokenResponse,
+  IUserPublicInfoResponse,
+} from "../types";
 
 export const generateAuthJWT = (userId: mongoose.Types.ObjectId) => {
   return jwt.sign({ userId }, process.env.JWT_SECRET_KEY as string, {
@@ -21,29 +26,37 @@ const generateInviteToken = (email: string) =>
   });
 
 export const createUser = catchAsyncError(
-  async (req: IGetUserEmailRequest, res: Response, next: NextFunction) => {
-    const user = new User({
+  async (
+    req: IGetUserEmailRequest,
+    res: IUserPublicInfoResponse,
+    next: NextFunction
+  ) => {
+    const userQuery = new User({
       ...req.body,
       email: req.email,
       isAdmin: false,
     });
-    await user.save();
-    return res.status(200).json(user);
+    const user = await userQuery.save();
+    return res.status(200).json({ name: user.name, email: user.email });
   }
 );
 
 export const userLogin = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: ITokenResponse, next: NextFunction) => {
     const { email, password } = req.body;
     const user = await User.getUserByCredentials(email, password);
     const token = generateAuthJWT(user.id);
     user.tokens.push({ token });
     await user.save();
-    return res.status(200).json({ ...user, token });
+    return res.status(200).json({ token });
   }
 );
 export const userLogout = catchAsyncError(
-  async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => {
+  async (
+    req: IGetUserAuthInfoRequest,
+    res: Response<{ message: string }>,
+    next: NextFunction
+  ) => {
     req.user.tokens = [];
     await req.user.save();
 
@@ -52,7 +65,11 @@ export const userLogout = catchAsyncError(
 );
 
 export const updateMe = catchAsyncError(
-  async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => {
+  async (
+    req: IGetUserAuthInfoRequest,
+    res: IUserPublicInfoResponse,
+    next: NextFunction
+  ) => {
     const updates = Object.keys(req.body || {});
 
     // ideally email should also be reset by sending out a magic link to the existing email
@@ -67,7 +84,7 @@ export const updateMe = catchAsyncError(
     const user = await User.findByIdAndUpdate(req.user.id, req.body, {
       runValidators: true,
       new: true,
-    });
+    }).select("name email");
 
     if (user) {
       return res.status(200).json(user);
@@ -78,11 +95,7 @@ export const updateMe = catchAsyncError(
 );
 
 export const createUserInvite = catchAsyncError(
-  async (
-    req: Request,
-    res: Response<{ token: string }>,
-    next: NextFunction
-  ) => {
+  async (req: Request, res: ITokenResponse, next: NextFunction) => {
     const { email } = req.body;
 
     if (!isValidEmail(email)) throw new AppError("Invalid Email address", 500);
@@ -101,7 +114,11 @@ export const createUserInvite = catchAsyncError(
 );
 
 export const getMe = catchAsyncError(
-  async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => {
+  async (
+    req: IGetUserAuthInfoRequest,
+    res: IUserPublicInfoResponse,
+    next: NextFunction
+  ) => {
     console.log(req.user.id);
     const user = await User.findById(req?.user?.id).select("name email");
 

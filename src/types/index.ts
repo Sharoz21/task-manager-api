@@ -12,14 +12,6 @@ interface IReqUser extends User {
   tasks?: HydratedDocument<typeof Model<ITask>>[];
 }
 
-export interface IGetUserAuthInfoRequest extends Request {
-  user: IReqUser;
-}
-
-export interface IGetUserEmailRequest extends Request {
-  email: string;
-}
-
 type Task = Document<unknown, {}, ITask> &
   ITask & {
     _id: Types.ObjectId;
@@ -30,6 +22,28 @@ export type IPopulatedTask =
       typeof Model<ITask> & { _id: Types.ObjectId })[]
   | undefined;
 
+type IErrorMessage = {
+  status: "error";
+  message: "Something went very wrong!";
+};
+
+type IToken = {
+  token: string;
+};
+
+type IUserPublicInfo = Pick<IUser, "name" | "email"> | null;
+
 export type ITaskResponse = Response<Task>;
 export type ITaskArrayResponse = Response<Task[]>;
 export type IPopulatedTaskArrayResponse = Response<IPopulatedTask>;
+export type IUserPublicInfoResponse = Response<IUserPublicInfo>;
+export type IErrorResponse = Response<IErrorMessage>;
+export type ITokenResponse = Response<IToken>;
+
+export type IErrorRequest = Request<IErrorMessage>;
+export interface IGetUserAuthInfoRequest extends Request {
+  user: IReqUser;
+}
+export interface IGetUserEmailRequest extends Request {
+  email: string;
+}

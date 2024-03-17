@@ -23,6 +23,7 @@ export interface IUserModel extends Model<IUser> {
     email: String,
     password: String
   ): HydratedDocument<IUser, IUserModel>;
+  getPublicFields(): { name: string; email: string };
 }
 
 export const userSchema = new Schema<IUser>({
@@ -67,6 +68,10 @@ userSchema.static("getUserByCredentials", async function (email, password) {
 
   return user;
 });
+
+userSchema.methods.getPublicFields = function () {
+  return { name: this.name, email: this.email };
+};
 
 userSchema.pre("save", async function (next) {
   if (this.isModified("password")) {

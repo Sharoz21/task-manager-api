@@ -5,7 +5,11 @@ import User from "../models/user";
 import { catchAsyncError } from "../utils/catchAsyncError";
 import AppError from "../utils/appError";
 import "dotenv/config";
-import { IGetUserAuthInfoRequest, IGetUserEmailRequest } from "../types";
+import {
+  IGetUserAuthInfoRequest,
+  IGetUserEmailRequest,
+  ITokenResponse,
+} from "../types";
 import Invitation from "../models/invitation";
 import { generateAuthJWT } from "./userController";
 
@@ -84,8 +88,7 @@ export const isAdmin = catchAsyncError(
 );
 
 export const forgotPassword = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
-    console.log("hit");
+  async (req: Request, res: ITokenResponse, next: NextFunction) => {
     const user = await User.findOne({ email: req.body.email });
     if (!user) {
       return next(new AppError("There is no user with email address.", 404));
@@ -109,7 +112,7 @@ export const forgotPassword = catchAsyncError(
 );
 
 export const resetPassword = catchAsyncError(
-  async (req: Request, res: Response, next: NextFunction) => {
+  async (req: Request, res: ITokenResponse, next: NextFunction) => {
     const hashedToken = crypto
       .createHash("sha256")
       .update(req.params.token)
@@ -136,11 +139,7 @@ export const resetPassword = catchAsyncError(
     await user.save();
 
     res.status(200).json({
-      status: "success",
       token,
-      data: {
-        user,
-      },
     });
   }
 );

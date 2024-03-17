@@ -1,5 +1,5 @@
-import Task, { ITask } from "../models/task";
-import { Request, Response, NextFunction } from "express";
+import Task from "../models/task";
+import { Request, NextFunction } from "express";
 import { catchAsyncError } from "../utils/catchAsyncError";
 import AppError from "../utils/appError";
 import {
@@ -102,7 +102,11 @@ export const getUserTasks = catchAsyncError(
 );
 
 export const getAllTasks = catchAsyncError(
-  async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => {
+  async (
+    req: IGetUserAuthInfoRequest,
+    res: ITaskArrayResponse,
+    next: NextFunction
+  ) => {
     const filters = { ...(req?.query || {}) };
     const allowedFilterFields = ["completed", "owner"];
 

@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import AppError from "./../utils/appError";
 import { MongooseError } from "mongoose";
 import { AppErrorType } from "../constants";
+import { IErrorRequest, IErrorResponse } from "../types";
 
 // mongoose doesn't provide an error types for following properties
 interface CustomMongooseError extends MongooseError {
@@ -54,8 +55,8 @@ const sendErrorResponse = (
 
 module.exports = (
   err: InstanceType<typeof AppError>,
-  req: Request<{ status: string; message: string }>,
-  res: Response,
+  req: IErrorRequest,
+  res: IErrorResponse,
   next: NextFunction
 ) => {
   err.statusCode = err.statusCode || 500;
