@@ -13,7 +13,6 @@ const verifyJWT = (incomingJWT: string) => {
   return jwt.verify(incomingJWT, process.env.JWT_SECRET_KEY as string);
 };
 
-// TODO check if password change after jwt was issued
 export const isAuthenticated = catchAsyncError(
   async (req: IGetUserAuthInfoRequest, res: Response, next: NextFunction) => {
     const { headers } = req;

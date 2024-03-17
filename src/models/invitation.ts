@@ -4,7 +4,6 @@ const validator = require("validator");
 interface IInvitation {
   email: String;
   token: String;
-  valid: Boolean;
 }
 
 const invitationSchema = new Schema<IInvitation>({
@@ -19,7 +18,6 @@ const invitationSchema = new Schema<IInvitation>({
     required: true,
     unique: true,
   },
-  valid: { type: Boolean, required: true },
 });
 
 const Invitation = model<IInvitation>("invitation", invitationSchema);

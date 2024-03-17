@@ -92,7 +92,7 @@ export const createUserInvite = catchAsyncError(
     //if the email already exists in db, refresh the token
     await Invitation.findOneAndUpdate(
       { email },
-      { email, token: inviteToken, valid: true },
+      { email, token: inviteToken },
       { upsert: true, new: true, setDefaultsOnInsert: true }
     );
 
