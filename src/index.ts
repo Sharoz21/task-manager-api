@@ -15,49 +15,8 @@ const app = express();
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use(express.json());
-app.use(
-  "/users",
-  /* 
-      #swagger.security = [{
-          "apiKeyAuth": []
-      }] 
-
-      #swagger.parameters = [{ 
-                  "name": "authorization",
-                  "in": "header",
-                  "type": "string",
-                  "required": true,
-                  "schema": {"type":"string", "format":"jwt", "example":"Bearer your_token_here"},
-        }]
-
-      #swagger.responses[500] = {
-          schema: { "message":"string", "status":"string"  }
-      }  
-*/ userRouter
-);
-app.use(
-  "/tasks",
-  taskRouter /* 
-#swagger.tags = ['Tasks']
-
-#swagger.security = [{
-    "apiKeyAuth": []
-}] 
-
-#swagger.parameters = [{ 
-            "name": "authorization",
-            "in": "header",
-            "type": "string",
-            "required": true,
-            "schema": {"type":"string", "format":"jwt", "example":"Bearer your_token_here"},
-}]
-
-#swagger.responses[500] = {
-    schema: { "message":"string", "status":"string"  }
-}  
-
-*/
-);
+app.use("/users", userRouter);
+app.use("/tasks", taskRouter);
 
 const PORT = process.env.PORT || 8080;
 

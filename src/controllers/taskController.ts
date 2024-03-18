@@ -11,28 +11,6 @@ import {
 
 export const createTask = catchAsyncError(
   async (req: Request, res: ITaskResponse, next: NextFunction) => {
-    /* 
-    #swagger.summary = 'Create User Task'
-    #swagger.parameters['body'] = {
-            "in": "body",
-            "description": "Create new task",
-            "required": true,
-            "schema": {
-                "description": "New task",
-                "completed": false
-    }
-  }
-    #swagger.parameters = [{ 
-            "name": "authorization",
-            "in": "header",
-            "type": "string",
-            "required": true
-  }] 
-     #swagger.responses[200] = {
-            description: 'Created Task',
-            schema: { $ref: '#/definitions/Task' }
-    }
-  */
     const task = new Task({ ...req.body, owner: (req as any).user.id });
     await task.save();
 
@@ -46,21 +24,6 @@ export const getTaskById = catchAsyncError(
     res: ITaskResponse,
     next: NextFunction
   ) => {
-    /* 
-    #swagger.summary = 'Get User Task by Id'
-    #swagger.parameters = [{ 
-            "name": "authorization",
-            "in": "header",
-            "type": "string",
-            "required": true
-  }]
-
-   #swagger.responses[200] = {
-            description: 'Task by Id',
-            schema: { $ref: '#/definitions/Task' }
-    }
-  
-  */
     const task = await Task.findOne({
       _id: req.params.id,
       owner: req?.user?.id,
@@ -80,29 +43,6 @@ export const updateTaskById = catchAsyncError(
     res: ITaskResponse,
     next: NextFunction
   ) => {
-    /*
-      #swagger.summary = 'Update User Task by Id'
-
-     #swagger.parameters['body'] = {
-            "in": "body",
-            "description": "Update task",
-            "required": true,
-            "schema": {
-                "description": "New task",
-                "completed": false
-    }
-  } 
-    #swagger.parameters = [{ 
-            "name": "authorization",
-              "in": "header",
-            "type": "string",
-            "required": true
-  }] 
-     #swagger.responses[200] = {
-            description: 'Updated Task',
-            schema: { $ref: '#/definitions/Task' }
-    }
-  */
     const updates = Object.keys(req.body || {});
     const allowedUpdates = ["description", "completed"];
     const isValidOperation = updates.every((update) =>
@@ -137,20 +77,6 @@ export const deleteTaskById = catchAsyncError(
     res: ITaskResponse,
     next: NextFunction
   ) => {
-    /* 
-    #swagger.summary = 'Delete User Task by Id'
-
-    #swagger.parameters = [{ 
-            "name": "authorization",
-            "in": "header",
-            "type": "string",
-            "required": true
-  }]
-    #swagger.responses[200] = {
-            description: 'Deleted Task',
-            schema: { $ref: '#/definitions/Task' }
-    }
-  */
     const task = await Task.findOneAndDelete({
       _id: req.params.id,
       owner: req.user.id,
@@ -170,20 +96,6 @@ export const getUserTasks = catchAsyncError(
     res: IPopulatedTaskArrayResponse,
     next: NextFunction
   ) => {
-    /*
-    #swagger.summary = 'Get All Tasks of current user'
-
-    #swagger.parameters = [{ 
-            "name": "authorization",
-            "in": "header",
-            "type": "string",
-            "required": true
-  }]
-     #swagger.responses[200] = {
-            description: 'Array of tasks',
-            schema: { $ref: '#/definitions/TaskArray' }
-    }
-  */
     const tasks = (await req.user.populate("tasks"))?.tasks;
     res.json(tasks);
   }
@@ -195,24 +107,6 @@ export const getAllTasks = catchAsyncError(
     res: ITaskArrayResponse,
     next: NextFunction
   ) => {
-    /*
-    #swagger.summary = 'Get All Tasks with query filters (Only accessible through admin users)'
- 
-    #swagger.parameters['owner'] = { "in":"query", "type":"string"}
-    #swagger.parameters['limit'] = { "in":"query", "type":"string"}
-    #swagger.parameters['offset'] = { "in":"query", "type":"string"}
-    #swagger.parameters = [
-      { 
-            "name": "authorization",
-            "in": "header",
-            "type": "string",
-            "required": true
-    }]
-    #swagger.responses[200] = {
-            description: 'Array of tasks',
-            schema: { $ref: '#/definitions/TaskArray' }
-    }
-    */
     const filters = { ...(req?.query || {}) };
     const allowedFilterFields = ["completed", "owner"];
 
