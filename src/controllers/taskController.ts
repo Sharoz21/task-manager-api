@@ -10,8 +10,12 @@ import {
 } from "../types";
 
 export const createTask = catchAsyncError(
-  async (req: Request, res: ITaskResponse, next: NextFunction) => {
-    const task = new Task({ ...req.body, owner: (req as any).user.id });
+  async (
+    req: IGetUserAuthInfoRequest,
+    res: ITaskResponse,
+    next: NextFunction
+  ) => {
+    const task = new Task({ ...req.body, owner: req.user.id });
     await task.save();
 
     return res.status(200).json(task);
