@@ -66,6 +66,15 @@ export const userLogin = catchAsyncError(
   async (req: Request, res: ITokenResponse, next: NextFunction) => {
     /* #swagger.tags = ['Users'] 
     #swagger.summary = 'Log in user'
+    #swagger.parameters['body'] = {
+            "in": "body",
+            "description": "User credentials",
+            "required": true,
+            "schema": {
+                "name": "John Doe",
+                "password": "mypassword"
+    }
+  }
     #swagger.parameters = [{ 
             "name": "authorization",
             "in": "header",
@@ -132,7 +141,16 @@ export const updateMe = catchAsyncError(
     /* 
     #swagger.tags = ['Users']
     #swagger.summary = 'Update current user's info (for passwords, use reset password endpoint)' 
-    #swagger.parameters = [{ 
+   
+    #swagger.parameters = [{
+            "in": "body",
+            "description": "Update User",
+            "required": true,
+            "schema": {
+                "name": "John Doe",
+                "email": "johndoe@gmail.com"
+    }
+  },{ 
             "name": "authorization",
             "in": "header",
             "type": "string",
@@ -178,6 +196,15 @@ export const createUserInvite = catchAsyncError(
     /* 
     #swagger.tags = ['Users'] 
     #swagger.summary = 'Generate invite token (accessible only for admin users)'
+    #swagger.parameters['body'] = {
+            "in": "body",
+            "description": "Provide email for invitation",
+            "required": true,
+            "schema": {
+                "email": "johndoe@gmail.com",
+                
+    }
+  }
     #swagger.parameters = [{ 
             "name": "authorization",
             "in": "header",

@@ -5,19 +5,12 @@
     "version": "1.0.0",
     "description": ""
   },
-  "host": "localhost:8080",
-  "servers": [
-    {
-      "url": "localhost:8080"
-    }
-  ],
   "basePath": "/",
-  "schemes": [
-    "http"
-  ],
+  "schemes": ["http"],
   "paths": {
     "/users/forgotPassword": {
       "post": {
+        "tags": ["Users"],
         "description": "",
         "parameters": [
           {
@@ -66,6 +59,7 @@
     },
     "/users/resetPassword/{token}": {
       "patch": {
+        "tags": ["Users"],
         "description": "",
         "parameters": [
           {
@@ -75,36 +69,14 @@
             "type": "string"
           },
           {
-            "name": "authorization",
-            "in": "header",
-            "type": "string",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "type": {
-                  "type": "string",
-                  "example": "string"
-                },
-                "format": {
-                  "type": "string",
-                  "example": "jwt"
-                },
-                "example": {
-                  "type": "string",
-                  "example": "Bearer your_token_here"
-                }
-              }
-            }
-          },
-          {
             "name": "body",
             "in": "body",
             "schema": {
               "type": "object",
               "properties": {
                 "password": {
-                  "example": "any"
+                  "type": "string",
+                  "example": "newpassword"
                 }
               }
             }
@@ -112,7 +84,19 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "Auth token for logged in user",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "type": "string",
+                  "example": "string"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
           },
           "500": {
             "schema": {
@@ -143,9 +127,7 @@
     },
     "/users/invite": {
       "post": {
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "summary": "Generate invite token (accessible only for admin users)",
         "description": "",
         "parameters": [
@@ -168,6 +150,21 @@
                 "example": {
                   "type": "string",
                   "example": "Bearer your_token_here"
+                }
+              }
+            }
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Provide email for invitation",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "example": "johndoe@gmail.com"
                 }
               }
             }
@@ -218,31 +215,25 @@
     },
     "/users/login": {
       "post": {
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "summary": "Log in user",
         "description": "",
         "parameters": [
           {
-            "name": "authorization",
-            "in": "header",
-            "type": "string",
+            "name": "body",
+            "in": "body",
+            "description": "User credentials",
             "required": true,
             "schema": {
               "type": "object",
               "properties": {
-                "type": {
+                "name": {
                   "type": "string",
-                  "example": "string"
+                  "example": "John Doe"
                 },
-                "format": {
+                "password": {
                   "type": "string",
-                  "example": "jwt"
-                },
-                "example": {
-                  "type": "string",
-                  "example": "Bearer your_token_here"
+                  "example": "mypassword"
                 }
               }
             }
@@ -293,15 +284,33 @@
     },
     "/users/logout": {
       "post": {
+        "tags": ["Users"],
+        "summary": "Log current user out",
         "description": "",
         "parameters": [
           {
             "name": "authorization",
             "in": "header",
-            "type": "string"
+            "type": "string",
+            "required": true
           }
         ],
         "responses": {
+          "200": {
+            "description": "Message on logout success",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "example": "string"
+                }
+              },
+              "xml": {
+                "name": "main"
+              }
+            }
+          },
           "500": {
             "schema": {
               "type": "object",
@@ -331,9 +340,7 @@
     },
     "/users/{token}": {
       "post": {
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "summary": "Create new user with invite token",
         "description": "",
         "parameters": [
@@ -342,29 +349,6 @@
             "in": "path",
             "required": true,
             "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "type": {
-                  "type": "string",
-                  "example": "string"
-                },
-                "format": {
-                  "type": "string",
-                  "example": "jwt"
-                },
-                "example": {
-                  "type": "string",
-                  "example": "Bearer your_token_here"
-                }
-              }
-            }
           }
         ],
         "responses": {
@@ -403,10 +387,8 @@
     },
     "/users/me": {
       "patch": {
-        "tags": [
-          "Users"
-        ],
-        "summary": "Update current user",
+        "tags": ["Users"],
+        "summary": "Update current user's info (for passwords, use reset password endpoint)",
         "description": "",
         "parameters": [
           {
@@ -428,6 +410,25 @@
                 "example": {
                   "type": "string",
                   "example": "Bearer your_token_here"
+                }
+              }
+            }
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "description": "Update user's public info",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "example": "johndoe@gmail.com"
+                },
+                "name": {
+                  "type": "string",
+                  "example": "John Doe"
                 }
               }
             }
@@ -467,9 +468,7 @@
         ]
       },
       "get": {
-        "tags": [
-          "Users"
-        ],
+        "tags": ["Users"],
         "summary": "Get public info of current user",
         "description": "",
         "parameters": [
@@ -533,9 +532,7 @@
     },
     "/tasks/all": {
       "get": {
-        "tags": [
-          "Tasks"
-        ],
+        "tags": ["Tasks"],
         "summary": "Get All Tasks with query filters (Only accessible through admin users)",
         "description": "",
         "parameters": [
@@ -597,9 +594,7 @@
     },
     "/tasks/{id}": {
       "get": {
-        "tags": [
-          "Tasks"
-        ],
+        "tags": ["Tasks"],
         "summary": "Get User Task by Id",
         "description": "",
         "parameters": [
@@ -650,9 +645,7 @@
         ]
       },
       "patch": {
-        "tags": [
-          "Tasks"
-        ],
+        "tags": ["Tasks"],
         "summary": "Update User Task by Id",
         "description": "",
         "parameters": [
@@ -722,9 +715,7 @@
         ]
       },
       "delete": {
-        "tags": [
-          "Tasks"
-        ],
+        "tags": ["Tasks"],
         "summary": "Delete User Task by Id",
         "description": "",
         "parameters": [
@@ -777,9 +768,7 @@
     },
     "/tasks/": {
       "post": {
-        "tags": [
-          "Tasks"
-        ],
+        "tags": ["Tasks"],
         "summary": "Create User Task",
         "description": "",
         "parameters": [
@@ -843,9 +832,7 @@
         ]
       },
       "get": {
-        "tags": [
-          "Tasks"
-        ],
+        "tags": ["Tasks"],
         "summary": "Get All Tasks of current user",
         "description": "",
         "parameters": [
@@ -901,11 +888,7 @@
         },
         "required": {
           "type": "array",
-          "example": [
-            "name",
-            "email",
-            "password"
-          ],
+          "example": ["name", "email", "password"],
           "items": {
             "type": "string"
           }
